@@ -2,15 +2,18 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-sdk/client"
 )
 
 func main() {
 	ctx := context.Background()
 
+	ctx := context.Background()
 	// Create client with options
 	cli, err := client.New(
 		ctx,
@@ -45,4 +48,36 @@ func getDockerOptions() []client.ClientOption {
 	}
 
 	return options
+}
+
+func getRunningDockerContainers(cli client.SDKClient, ctx context.Context) ([]container.Summary, error) {
+	containers, err := cli.ContainerList(ctx, container.ListOptions{All: true})
+	if err != nil {
+		log.Fatalf("Error listing containers: %v", err)
+		return nil, err
+	}
+
+	fmt.Printf("Checking %d containers:\n\n", len(containers))
+
+	containersRunning := []container.Summary{}
+
+	for _, container := range containers {
+		if container.State == "running" {
+			containersRunning = append(containersRunning, container)
+		}
+	}
+
+	return containersRunning, nil
+}
+
+func getHostnames(containers []container.Summary, labelKey string) ([]string, error) {
+	hostnames := []string{}
+
+	for _, container := range containers {
+		if labelValue, ok := container.Labels[labelKey]; ok {
+			hostnames = append(hostnames, labelValue)
+		}
+	}
+
+	return hostnames, nil
 }
