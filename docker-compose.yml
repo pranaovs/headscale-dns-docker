@@ -1,0 +1,17 @@
+services:
+  headscale-dns-docker:
+    image: ghcr.io/pranaovs/headscale-dns-docker:latest
+    container_name: headscale-dns-docker
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/headscale:/data # Headscale extra_records.json path
+    environment:
+      - HEADSCALE_DNS_JSON_PATH=/data/extra_records.json
+      - HEADSCALE_DNS_NODE_HOSTNAME=<Tailscale Hostname> # tailscale whois $(tailscale ip --1)
+      - HEADSCALE_DNS_NODE_IP=<Tailscale IPv4>
+      - HEADSCALE_DNS_NODE_IP6=<Tailscale IPv6>
+      - HEADSCALE_DNS_BASE_DOMAIN=ts.net
+      # - HEADSCALE_DNS_LABEL_KEY=headscale.dns.subdomain
+      # - HEADSCALE_DNS_REFRESH_SECONDS=60
+      - HEADSCALE_DNS_NO_BASE_DOMAIN=true # Create additional DNS Records without HEADSCALE_DNS_BASE_DOMAIN
