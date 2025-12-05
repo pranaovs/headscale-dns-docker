@@ -71,14 +71,14 @@ func getRunningDockerContainers(cli client.SDKClient, ctx context.Context) ([]co
 	return containersRunning, nil
 }
 
-func getHostnames(containers []container.Summary, labelKey string) ([]string, error) {
+func getSubdomainsFromLabels(containers []container.Summary, labelKey string) ([]string, error) {
 	hostnames := []string{}
 
 	for _, container := range containers {
 		if labelValue, ok := container.Labels[labelKey]; ok {
 			// Split the label value by | to support multiple hostnames
-			splitHostnames := strings.Split(labelValue, "|")
-			for _, hostname := range splitHostnames {
+			splitHostnames := strings.SplitSeq(labelValue, "|")
+			for hostname := range splitHostnames {
 				if trimmedHostname := strings.TrimSpace(hostname); trimmedHostname != "" {
 					hostnames = append(hostnames, trimmedHostname)
 				}
