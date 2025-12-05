@@ -128,7 +128,7 @@ func main() {
 		records := createJSON(subdomains, nodeHostname+"."+baseDomain, nodeConfig)
 
 		// Marshal to JSON with proper formatting
-		jsonData, err := json.MarshalIndent(records, "", "  ")
+		jsonData, err := json.MarshalIndent(sortJSON(records), "", "  ")
 		if err != nil {
 			log.Fatalf("Error marshaling JSON: %v", err)
 			return
@@ -156,12 +156,7 @@ func main() {
 
 // https://github.com/juanfont/headscale/blob/main/docs/ref/dns.md
 func createJSON(subdomains []string, domain string, nodeConfig NodeIP) []map[string]any {
-	var records []map[string]any
-
-	// Initialize as empty slice instead of nil
-	if records == nil {
-		records = make([]map[string]any, 0)
-	}
+	records := make([]map[string]any, 0)
 
 	for _, subdomain := range subdomains {
 		// Create A record for IPv4
@@ -185,6 +180,10 @@ func createJSON(subdomains []string, domain string, nodeConfig NodeIP) []map[str
 		}
 	}
 
+	return records
+}
+
+func sortJSON(records []map[string]any) []map[string]any {
 	// Sort the keys
 	// "Be sure to "sort keys" and produce a stable output in case you generate the JSON file with a script.
 	// Headscale uses a checksum to detect changes to the file and a stable output avoids unnecessary processing."
@@ -200,11 +199,6 @@ func createJSON(subdomains []string, domain string, nodeConfig NodeIP) []map[str
 		typeJ := records[j]["type"].(string)
 		return typeI < typeJ
 	})
-
-	// Ensure we always return an empty array instead of null
-	if len(records) == 0 {
-		return []map[string]any{}
-	}
 
 	return records
 }
