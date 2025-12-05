@@ -50,6 +50,12 @@ func main() {
 		log.Fatal("HEADSCALE_DNS_NODE_HOSTNAME environment variable is required")
 	}
 
+	noBaseDomain := false
+	noBaseDomainStr, ok := os.LookupEnv("HEADSCALE_DNS_NO_BASE_DOMAIN")
+	if ok && (noBaseDomainStr == "1" || strings.ToLower(noBaseDomainStr) == "true") {
+		noBaseDomain = true
+	}
+
 	nodeIP4Str, ok := os.LookupEnv("HEADSCALE_DNS_NODE_IP")
 	if !ok {
 		log.Fatal("HEADSCALE_DNS_NODE_IP environment variable is required. Use tailscale ip to get the node IP.")
@@ -98,6 +104,7 @@ func main() {
 	log.Printf(" - JSON extra_records_path path: %s", extraRecordsPath)
 	log.Printf(" - Base Domain: %s", baseDomain)
 	log.Printf(" - Node Hostname: %s", nodeHostname)
+	log.Printf(" - Create records with no base domain: %t", noBaseDomain)
 	log.Printf(" - Node IPv4 Address: %s", nodeConfig.IPv4.String())
 	if nodeConfig.IPv6 != nil {
 		log.Printf(" - Node IPv6 Address: %s", nodeConfig.IPv6.String())
@@ -126,6 +133,10 @@ func main() {
 
 		// Create JSON records
 		records := createJSON(subdomains, nodeHostname+"."+baseDomain, nodeConfig)
+		// Create DNS records with no base domain
+		if noBaseDomain {
+			records = append(records, createJSON(subdomains, nodeHostname, nodeConfig)...)
+		}
 
 		// Marshal to JSON with proper formatting
 		jsonData, err := json.MarshalIndent(sortJSON(records), "", "  ")
