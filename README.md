@@ -22,9 +22,11 @@ Refer: <https://github.com/juanfont/headscale/blob/main/docs/ref/dns.md>
 | `HEADSCALE_DNS_NODE_IP` | Yes | - | IPv4 address of the node |
 | `HEADSCALE_DNS_NODE_IP6` | No | - | IPv6 address of the node |
 | `HEADSCALE_DNS_BASE_DOMAIN` | No | `ts.net` | Base domain for DNS records |
-| `HEADSCALE_DNS_LABEL_KEY` | No | `headscale.dns.subdomain` | Docker label key to look for |
+| `HEADSCALE_DNS_LABEL_KEY` | No | `headscale.dns.subdomain` | Docker label key to look for (in seconds) |
 | `HEADSCALE_DNS_REFRESH_SECONDS` | No | `60` | How often to scan containers |
 | `HEADSCALE_DNS_NO_BASE_DOMAIN` | No | `false` | Create additional records without base domain |
+| `DOCKER_HOST` | No | `unix:///var/run/docker.sock` | Docker host socket path |
+| `DOCKER_CONTEXT` | No | - | Docker Context |
 
 ### Deployment Example with Docker Compose
 
