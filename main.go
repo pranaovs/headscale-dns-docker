@@ -229,6 +229,10 @@ func getDockerOptions() []client.ClientOption {
 		options = append(options, client.WithDockerContext(dockerContext))
 	}
 
+	if dockerContext == "" && dockerHost == "" {
+		options = append(options, client.WithDockerHost("unix:///var/run/docker.sock"))
+	}
+
 	return options
 }
 
