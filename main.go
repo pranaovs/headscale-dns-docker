@@ -140,11 +140,13 @@ func main() {
 			log.Fatalf("Error writing JSON file: %v", err)
 			return
 		}
-
 		log.Printf("Successfully wrote %d DNS records to JSON file", len(records))
 	}
 
-	// Repeat every n seconds
+	// Run once on startup
+	processContainers()
+
+	// Repeat every HEADSCALE_DNS_REFRESH_SECONDS seconds
 	ticker := time.NewTicker(time.Duration(refreshSeconds) * time.Second)
 	defer ticker.Stop()
 	for range ticker.C {
